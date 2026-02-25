@@ -3,7 +3,8 @@
 E-Plant Shopping is a React + Redux based e-commerce web application that allows users to browse plants and manage a shopping cart.
 
 ## 🚀 Live Demo
-👉 https://chayanhati.github.io/e-plantShopping/
+👉 [https://chayanhati.github.io/e-plantShopping/]
+(https://chayanhati20-4173.theianext-0-labs-prod-misc-tools-us-east-0.proxy.cognitiveclass.ai/e-plantShopping/)
 
 ---
 
