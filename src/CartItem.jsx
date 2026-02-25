@@ -1,45 +1,80 @@
-import { createSlice } from "@reduxjs/toolkit";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { removeFromCart, updateQuantity } from "./CartSlice";
+import "./CartItem.css";
 
-const initialState = {
-  items: [],
-};
+function CartItem({ onContinueShopping }) {
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items);
 
-const cartSlice = createSlice({
-  name: "cart",
-  initialState,
-  reducers: {
-    addToCart: (state, action) => {
-      const existingItem = state.items.find(
-        (item) => item.name === action.payload.name
+  const handleIncrease = (item) => {
+    dispatch(
+      updateQuantity({
+        name: item.name,
+        quantity: item.quantity + 1,
+      })
+    );
+  };
+
+  const handleDecrease = (item) => {
+    if (item.quantity > 1) {
+      dispatch(
+        updateQuantity({
+          name: item.name,
+          quantity: item.quantity - 1,
+        })
       );
+    }
+  };
 
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        state.items.push({ ...action.payload, quantity: 1 });
-      }
-    },
+  const handleRemove = (name) => {
+    dispatch(removeFromCart(name));
+  };
 
-    removeFromCart: (state, action) => {
-      state.items = state.items.filter(
-        (item) => item.name !== action.payload
-      );
-    },
+  const calculateTotal = () => {
+    return cartItems.reduce(
+      (total, item) => total + item.cost * item.quantity,
+      0
+    );
+  };
 
-    updateQuantity: (state, action) => {
-      const { name, quantity } = action.payload;
-      const item = state.items.find((item) => item.name === name);
-      if (item) {
-        item.quantity = quantity;
-      }
-    },
-  },
-});
+  return (
+    <div className="cart-container">
+      <h2>Your Cart</h2>
 
-export const {
-  addToCart,
-  removeFromCart,
-  updateQuantity,
-} = cartSlice.actions;
+      {cartItems.length === 0 ? (
+        <p>Your cart is empty</p>
+      ) : (
+        cartItems.map((item, index) => (
+          <div key={index} className="cart-item">
+            <img src={item.image} alt={item.name} width="80" />
+            <div>
+              <h4>{item.name}</h4>
+              <p>Price: ${item.cost}</p>
 
-export default cartSlice.reducer;
+              <div className="quantity-controls">
+                <button onClick={() => handleDecrease(item)}>-</button>
+                <span>{item.quantity}</span>
+                <button onClick={() => handleIncrease(item)}>+</button>
+              </div>
+
+              <p>Subtotal: ${item.cost * item.quantity}</p>
+
+              <button onClick={() => handleRemove(item.name)}>
+                Remove
+              </button>
+            </div>
+          </div>
+        ))
+      )}
+
+      <h3>Total Cart Amount: ${calculateTotal()}</h3>
+
+      <button onClick={onContinueShopping}>
+        Continue Shopping
+      </button>
+    </div>
+  );
+}
+
+export default CartItem;
